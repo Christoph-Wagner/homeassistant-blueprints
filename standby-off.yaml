@@ -8,18 +8,18 @@ blueprint:
       name: Electric Power Sensor
       description: This sensor used to identify when the target device has been shut off.
       selector:
-          entity:
-              domain: sensor
+        entity:
+          domain: sensor
     power_threshold:
       name: Power Threshold in Watts
       description: When the device is not used is should draw less power than the power threshold so that the automation kicks in when that action of the device has finished. It should be set above the standby power of the device and below the power when is actively used. For reliability set the value with headroom. For example in the range of 5 Watts more than the constantly used power and 5 Watts less than the power that indicates your device activity. The default value is set to 20 Watts.
-      default: '20'
+      default: 20
     smart_plug_switch:
       name: Target Smart Plug
       description: This smart plug will be turned off once the treshold is reached for the configured amount of minutes.
       selector:
-          entity:
-              domain: switch
+        entity:
+          domain: switch
     off_delay:
       name: Wait time
       description: Time the plug need to be below the threshold for the automation to trigger
