@@ -32,7 +32,8 @@ blueprint:
 trigger:
   - below: !input power_threshold
     entity_id: !input power_sensor
-    for: !input off_delay
+    for: 
+      minutes: !input off_delay
     platform: numeric_state
 condition: []
 action:
