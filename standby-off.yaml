@@ -1,0 +1,42 @@
+# Adapted from https://community.home-assistant.io/t/refresh-zwave-device-status-after-consuming-power-workaround-fibaro-roller-shutter-3-position-update-issue/257541
+blueprint:
+  name: Turn off device after a certain time with little power draw
+  description: This is a blueprint to turn off a smart plug after the power draw has been low for a certain time. It’s useful for devices that draw significant power in standby, like PCs.
+  domain: automation
+  input:
+    power_sensor:
+      name: Electric Power Sensor
+      description: This sensor used to identify when the target device has been shut off.
+      selector:
+          entity:
+              domain: sensor
+    power_threshold:
+      name: Power Threshold in Watts
+      description: When the device is not used is should draw less power than the power threshold so that the automation kicks in when that action of the device has finished. It should be set above the standby power of the device and below the power when is actively used. For reliability set the value with headroom. For example in the range of 5 Watts more than the constantly used power and 5 Watts less than the power that indicates your device activity. The default value is set to 20 Watts.
+      default: '20'
+    smart_plug_switch:
+      name: Target Smart Plug
+      description: This smart plug will be turned off once the treshold is reached for the configured amount of minutes.
+      selector:
+          entity:
+              domain: switch
+    off_delay:
+      name: Wait time
+      description: Time the plug need to be below the threshold for the automation to trigger
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 60
+          unit_of_measurement: minutes
+trigger:
+  - below: !input power_threshold
+    entity_id: !input power_sensor
+    for: !input off_delay
+    platform: numeric_state
+condition: []
+action:
+  - data:
+      entity_id: !input smart_plug_switch
+    service: switch.turn_off
+mode: single
