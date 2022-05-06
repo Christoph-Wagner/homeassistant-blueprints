@@ -2,7 +2,7 @@ blueprint:
   name: Window controlled heater
   description: turn off heater when opening window and turn on with delay, save the last heating temp in a helper and set back to that number after closing
   domain: automation
-  #source_url: https://gist.github.com/Christoph-Wagner/52dda63a5f28782f29905a7a9115a177
+  source_url: https://github.com/Christoph-Wagner/homeassistant-blueprints/blob/main/window_controlled_heater.yaml
   #forked 2nd time from  https://gist.github.com/gresie/476f1169ddd4a1bbbb12662f5b20e383
   #forked from https://gist.github.com/dirkk1980/8ba849b480844b32e9ca484e6de5d552
   #inspired by https://github.com/home-assistant/core/blob/dev/homeassistant/components/automation/blueprints/motion_light.yaml
