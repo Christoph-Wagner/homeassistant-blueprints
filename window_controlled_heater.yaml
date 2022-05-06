@@ -1,0 +1,81 @@
+blueprint:
+  name: Window controlled heater
+  description: turn off heater when opening window and turn on with delay, save the last heating temp in a helper and set back to that number after closing
+  domain: automation
+  #source_url: https://gist.github.com/Christoph-Wagner/52dda63a5f28782f29905a7a9115a177
+  #forked 2nd time from  https://gist.github.com/gresie/476f1169ddd4a1bbbb12662f5b20e383
+  #forked from https://gist.github.com/dirkk1980/8ba849b480844b32e9ca484e6de5d552
+  #inspired by https://github.com/home-assistant/core/blob/dev/homeassistant/components/automation/blueprints/motion_light.yaml
+  input:
+    heating_target:
+      name: Heater
+      selector:
+        entity:
+          domain: climate
+    window_entity:
+      name: Window Sensor
+      selector:
+        entity:
+          domain: binary_sensor
+    last_heating_temp:
+      name: Last Heating Target
+      selector:
+        entity:
+          domain: input_number
+    window_closed_wait:
+      name: Wait time open
+      description: Time to leave the heating on after window or door is opened.
+      default: 120
+      selector:
+        number:
+          min: 0.0
+          max: 3600.0
+          unit_of_measurement: seconds
+          step: 1.0
+          mode: slider
+    window_opened_wait:
+      name: Wait time closed
+      description: Time to leave the heating off after window or door is closed.
+      default: 120
+      selector:
+        number:
+          min: 0.0
+          max: 3600.0
+          unit_of_measurement: seconds
+          step: 1.0
+          mode: slider
+mode: restart
+max_exceeded: silent
+variables:
+  heating_target: !input 'heating_target'
+  last_heating_temp: !input 'last_heating_temp'
+  heating_temperature: '{{ state_attr(heating_target, ''temperature'') }}'
+trigger:
+  platform: state
+  entity_id: !input 'window_entity'
+  from: 'off'
+  to: 'on'
+action:
+- delay: !input 'window_opened_wait'
+- service: climate.set_hvac_mode
+  entity_id: !input 'heating_target'
+  data:
+    hvac_mode: 'off'
+- service: input_number.set_value
+  entity_id: !input 'last_heating_temp'
+  data:
+    value: '{{ heating_temperature | float }}'
+- wait_for_trigger:
+    platform: state
+    entity_id: !input 'window_entity'
+    from: 'on'
+    to: 'off'
+- delay: !input 'window_closed_wait'
+- service: climate.set_hvac_mode
+  entity_id: !input 'heating_target'
+  data:
+    hvac_mode: heat
+- service: climate.set_temperature
+  entity_id: !input 'heating_target'
+  data:
+    temperature: '{{states(last_heating_temp) | float}}'
